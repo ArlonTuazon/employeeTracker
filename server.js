@@ -48,6 +48,7 @@ const promptUser = () => {
             'View All Roles',
             'View All Departments',
             'View All Employees By Department',
+            'View All Employees By Manager',
             'View Department Budgets',
             'Update Employee Role',
             'Update Employee Manager',
@@ -75,6 +76,9 @@ const promptUser = () => {
           if (choices === 'View All Employees By Department') {
               viewEmployeesByDepartment();
           }
+          if (choices === 'View All Employees By Manager') {
+            viewEmployeesByManager();
+        }
   
           if (choices === 'Add Employee') {
               addEmployee();
@@ -126,7 +130,7 @@ const promptUser = () => {
 
 // View All Employees
 const viewAllEmployees = () => {
-    let sql =  `select concat(e.first_name, ' ', e.last_name) 'Employee Name', d.name 'Department', r.title 'Role', r.salary 'Salary' ,IFNULL(concat(e2.first_name, ' ', e2.last_name),'None') 'Manager Name' from employee e left join role r on e.role_id = r.id left join department d on r.department_id = d.id left join employee e2 on e.manager_id = e2.id`;
+    let sql =  `SELECT concat(e.first_name, ' ', e.last_name) 'Employee Name', d.name 'Department', r.title 'Role', r.salary 'Salary' ,IFNULL(concat(e2.first_name, ' ', e2.last_name),'None') 'Manager Name' from employee e left join role r on e.role_id = r.id left join department d on r.department_id = d.id left join employee e2 on e.manager_id = e2.id`;
     connection.query(sql, (error, response) => {
       if (error) throw error;
       console.log(chalk.yellow.bold(`====================================================================================`));
@@ -143,7 +147,7 @@ const viewAllRoles = () => {
     console.log(chalk.yellow.bold(`====================================================================================`));
     console.log(`                              ` + chalk.green.bold(`Current Employee Roles:`));
     console.log(chalk.yellow.bold(`====================================================================================`));
-    const sql =  `select r.id 'Role ID', r.title 'Role Title', r.salary 'Role Salary', d.name 'Department', IFNULL(count(DISTINCT e.id),0) 'Employees Per Role' from role r left join employee e on r.id = e.role_id left join department d on r.department_id = d.id left join employee e2 on e.manager_id = e2.id group by r.id, r.title, r.salary;`;
+    const sql =  `SELECT r.id 'Role ID', r.title 'Role Title', r.salary 'Role Salary', d.name 'Department', IFNULL(count(DISTINCT e.id),0) 'Employees Per Role' from role r left join employee e on r.id = e.role_id left join department d on r.department_id = d.id left join employee e2 on e.manager_id = e2.id group by r.id, r.title, r.salary;`;
     connection.query(sql, (error, response) => {
       if (error) throw error;
         console.table(response);
@@ -153,7 +157,7 @@ const viewAllRoles = () => {
   };
 // View all Departments
 const viewAllDepartments = () => {
-    const sql =   `SELECT department.id AS id, department.name AS department FROM department`; 
+    const sql =   `SELECT department.id 'Department ID', department.name 'Department Name', count(DISTINCT role.id) 'Role Count', count(distinct employee.id) 'Employee Count' from department left join role on department.id = role.department_id inner join employee on role.id = employee.role_id group by department.id, department.name;`; 
     connection.query(sql, (error, response) => {
       if (error) throw error;
       console.log(chalk.yellow.bold(`====================================================================================`));
@@ -164,3 +168,49 @@ const viewAllDepartments = () => {
       promptUser();
     });
   };
+  // View all Employees by Department
+const viewEmployeesByDepartment = () => {
+    const sql =     `SELECT concat(employee.first_name, ' ', employee.last_name) 'Employee Name', 
+                    department.name AS Department
+                    FROM employee 
+                    LEFT JOIN role ON employee.role_id = role.id 
+                    LEFT JOIN department ON role.department_id = department.id`;
+    connection.query(sql, (error, response) => {
+      if (error) throw error;
+        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.log(`                              ` + chalk.green.bold(`Employees by Department:`));
+        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.table(response);
+        console.log(chalk.yellow.bold(`====================================================================================`));
+        promptUser();
+      });
+  };
+
+  // View all Employees by Manager
+  const viewEmployeesByManager = () => {
+    const sql =  `select distinct concat(e2.first_name, ' ', e2.last_name) 'ManagerName' from employee e left join employee e2 on e.manager_id = e2.id where e2.last_name is not null;`;
+    connection.query(sql, (error, response) => {
+      if (error) throw error;
+        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.log(`                              ` + chalk.green.bold(`Employees by Manager:`));
+        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.table(response);
+        console.log(chalk.yellow.bold(`====================================================================================`));
+        promptUser();
+      });
+  };
+
+  //View all Departments by Budget
+const viewDepartmentBudget = () => {
+    console.log(chalk.yellow.bold(`====================================================================================`));
+    console.log(`                              ` + chalk.green.bold(`Budget By Department:`));
+    console.log(chalk.yellow.bold(`====================================================================================`));
+    const sql = `select d.name 'Department', sum(r.salary) 'Utilized Budget' from department d left join role r on d.id = r.department_id group by d.name`;
+    connection.query(sql, (error, response) => {
+      if (error) throw error;
+        console.table(response);
+        console.log(chalk.yellow.bold(`====================================================================================`));
+        promptUser();
+    });
+  };
+  
