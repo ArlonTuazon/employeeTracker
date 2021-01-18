@@ -85,7 +85,7 @@ const promptUser = () => {
           }
   
           if (choices === 'Remove Employee') {
-              removeEmployee();
+              deleteEmployee();
           }
   
           if (choices === 'Update Employee Role') {
@@ -137,25 +137,25 @@ const viewAllEmployees = () => {
                        LEFT JOIN employee e2 on e.manager_id = e2.id`;
     connection.query(sql, (error, response) => {
       if (error) throw error;
-      console.log(chalk.yellow.bold(`====================================================================================`));
+      console.log(chalk.yellow.bold(`+++==============================================================================+++`));
       console.log(`                              ` + chalk.green.bold(`Current Employees:`));
-      console.log(chalk.yellow.bold(`====================================================================================`));
+      console.log(chalk.yellow.bold(`+++==============================================================================+++`));
       console.table(response);
-      console.log(chalk.yellow.bold(`====================================================================================`));
+      console.log(chalk.yellow.bold(`+++==============================================================================+++`));
       promptUser();
     });
   };
 
   // View all Roles
 const viewAllRoles = () => {
-    console.log(chalk.yellow.bold(`====================================================================================`));
+    console.log(chalk.yellow.bold(`+++=============================================================================+++`));
     console.log(`                              ` + chalk.green.bold(`Current Employee Roles:`));
-    console.log(chalk.yellow.bold(`====================================================================================`));
+    console.log(chalk.yellow.bold(`+++==============================================================================+++`));
     const sql =  `SELECT r.id 'Role ID', r.title 'Role Title', r.salary 'Role Salary', d.name 'Department', IFNULL(count(DISTINCT e.id),0) 'Employees Per Role' from role r left join employee e on r.id = e.role_id left join department d on r.department_id = d.id left join employee e2 on e.manager_id = e2.id group by r.id, r.title, r.salary;`;
     connection.query(sql, (error, response) => {
       if (error) throw error;
         console.table(response);
-        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.log(chalk.yellow.bold(`+++==============================================================================+++`));
         promptUser();
     });
   };
@@ -168,28 +168,28 @@ const viewAllDepartments = () => {
                           GROUP by department.id, department.name;`; 
     connection.query(sql, (error, response) => {
       if (error) throw error;
-      console.log(chalk.yellow.bold(`====================================================================================`));
+      console.log(chalk.yellow.bold(`+++==============================================================================+++`));
       console.log(`                              ` + chalk.green.bold(`All Departments:`));
-      console.log(chalk.yellow.bold(`====================================================================================`));
+      console.log(chalk.yellow.bold(`+++==============================================================================+++`));
       console.table(response);
-      console.log(chalk.yellow.bold(`====================================================================================`));
+      console.log(chalk.yellow.bold(`+++==============================================================================+++`));
       promptUser();
     });
   };
   // View all Employees by Department
 const viewEmployeesByDepartment = () => {
     const sql =     `SELECT concat(employee.first_name, ' ', employee.last_name) 'Employee Name', 
-                    department.name AS Department
+                    department.name 'Department'
                     FROM employee 
                     LEFT JOIN role ON employee.role_id = role.id 
                     LEFT JOIN department ON role.department_id = department.id`;
     connection.query(sql, (error, response) => {
       if (error) throw error;
-        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.log(chalk.yellow.bold(`+++==============================================================================+++`));
         console.log(`                              ` + chalk.green.bold(`Employees by Department:`));
-        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.log(chalk.yellow.bold(`+++==============================================================================+++`));
         console.table(response);
-        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.log(chalk.yellow.bold(`+++==============================================================================+++`));
         promptUser();
       });
   };
@@ -200,25 +200,27 @@ const viewEmployeesByDepartment = () => {
                   LEFT JOIN employee e2 on e.manager_id = e2.id where e2.last_name is not null;`;
     connection.query(sql, (error, response) => {
       if (error) throw error;
-        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.log(chalk.yellow.bold(`+++==============================================================================+++`));
         console.log(`                              ` + chalk.green.bold(`Employees by Manager:`));
-        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.log(chalk.yellow.bold(`+++==============================================================================+++`));
         console.table(response);
-        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.log(chalk.yellow.bold(`+++==============================================================================+++`));
         promptUser();
       });
   };
 
   //View all Departments by Budget
 const viewDepartmentBudget = () => {
-    console.log(chalk.yellow.bold(`====================================================================================`));
+    console.log(chalk.yellow.bold(`+++==============================================================================+++`));
     console.log(`                              ` + chalk.green.bold(`Budget By Department:`));
-    console.log(chalk.yellow.bold(`====================================================================================`));
-    const sql = `select d.name 'Department', sum(r.salary) 'Utilized Budget' from department d left join role r on d.id = r.department_id group by d.name`;
+    console.log(chalk.yellow.bold(`+++==============================================================================+++`));
+    const sql = `SELECT d.name 'Department', sum(r.salary) 'Utilized Budget' 
+                 FROM department d left join role r on d.id = r.department_id 
+                 GROUP BY d.name`;
     connection.query(sql, (error, response) => {
       if (error) throw error;
         console.table(response);
-        console.log(chalk.yellow.bold(`====================================================================================`));
+        console.log(chalk.yellow.bold(`+++==============================================================================+++`));
         promptUser();
     });
   };
@@ -368,9 +370,9 @@ const addRole = () => {
 
             connection.query(sql, crit, (error) => {
               if (error) throw error;
-              console.log(chalk.yellow.bold(`====================================================================================`));
+              console.log(chalk.yellow.bold(`+++==============================================================================+++`));
               console.log(chalk.greenBright(`Role successfully created!`));
-              console.log(chalk.yellow.bold(`====================================================================================`));
+              console.log(chalk.yellow.bold(`+++==============================================================================+++`));
               viewAllRoles();
             });
           });
@@ -466,9 +468,9 @@ const updateEmployeeRole = () => {
             [newTitleId, employeeId],
             (error) => {
               if (error) throw error;
-              console.log(chalk.greenBright.bold(`====================================================================================`));
+              console.log(chalk.greenBright.bold(`+++==============================================================================+++`));
               console.log(chalk.greenBright(`Employee Role Updated`));
-              console.log(chalk.greenBright.bold(`====================================================================================`));
+              console.log(chalk.greenBright.bold(`+++==============================================================================+++`));
               promptUser();
             }
           );
@@ -517,9 +519,9 @@ const updateEmployeeManager = () => {
         });
 
         if (validate.isSame(answer.chosenEmployee, answer.newManager)) {
-          console.log(chalk.redBright.bold(`====================================================================================`));
+          console.log(chalk.redBright.bold(`+++==============================================================================+++`));
           console.log(chalk.redBright(`Invalid Manager Selection`));
-          console.log(chalk.redBright.bold(`====================================================================================`));
+          console.log(chalk.redBright.bold(`+++==============================================================================+++`));
           promptUser();
         } else {
           let sql = `UPDATE employee SET employee.manager_id = ? WHERE employee.id = ?`;
@@ -529,9 +531,9 @@ const updateEmployeeManager = () => {
             [managerId, employeeId],
             (error) => {
               if (error) throw error;
-              console.log(chalk.greenBright.bold(`====================================================================================`));
+              console.log(chalk.greenBright.bold(`+++==============================================================================+++`));
               console.log(chalk.greenBright(`Employee Manager Updated`));
-              console.log(chalk.greenBright.bold(`====================================================================================`));
+              console.log(chalk.greenBright.bold(`+++==============================================================================+++`));
               promptUser();
             }
           );
@@ -542,8 +544,8 @@ const updateEmployeeManager = () => {
 
 //+++++++++++++++++ DELETE ++++++++++++++++
 // Delete an Employee
-const removeEmployee = () => {
-  let sql =     `SELECT employee.id, employee.first_name, employee.last_name FROM employee`;
+const deleteEmployee = () => {
+  let sql =     `SELECT employee.id, employee.first_name, employee.last_name from employee;`;
 
   connection.query(sql, (error, response) => {
     if (error) throw error;
@@ -553,7 +555,7 @@ const removeEmployee = () => {
     inquirer
       .prompt([
         {
-          name: 'chosenEmployee',
+          name: 'delEmployee',
           type: 'list',
           message: 'Which employee would you like to remove?',
           choices: employeeNamesArray
@@ -564,7 +566,7 @@ const removeEmployee = () => {
 
         response.forEach((employee) => {
           if (
-            answer.chosenEmployee ===
+            answer.delEmployee ===
             `${employee.first_name} ${employee.last_name}`
           ) {
             employeeId = employee.id;
@@ -574,9 +576,9 @@ const removeEmployee = () => {
         let sql = `DELETE FROM employee WHERE employee.id = ?`;
         connection.query(sql, [employeeId], (error) => {
           if (error) throw error;
-          console.log(chalk.redBright.bold(`====================================================================================`));
+          console.log(chalk.redBright.bold(`+++==============================================================================+++`));
           console.log(chalk.redBright(`Employee Successfully Removed`));
-          console.log(chalk.RedBright.bold(`====================================================================================`));
+          console.log(chalk.redBright.bold(`+++==============================================================================+++`));
           viewAllEmployees();
         });
       });
