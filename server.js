@@ -198,9 +198,10 @@ const viewEmployeesByDepartment = () => {
 
   // View all Employees by Manager
   const viewEmployeesByManager = () => {
-      connection.query(`SELECT distinct concat(e2.first_name, ' ', e2.last_name) 'ManagerName' 
-                      FROM employee e 
-                      LEFT JOIN employee e2 on e.manager_id = e2.id where e2.last_name is not null;`, 
+      connection.query(`SELECT concat(e.first_name, ' ', e.last_name) 'Employee Name', 
+                        IFNULL(concat(e2.first_name, ' ', e2.last_name),'None') 'Manager Name' FROM employee e
+                        LEFT JOIN employee e2 on e.manager_id = e2.id 
+                        ORDER BY e.role_id ASC`, 
       (error, response) => {
       if (error) throw error;
         console.log(chalk.yellow.bold(`+++==============================================================================+++`));
@@ -321,7 +322,7 @@ const addRole = () => {
         ])
         .then((answer) => {
           if (answer.departmentName === 'Create Department') {
-            this.addDepartment();
+            addDepartment();
           } else {
             addRoleResume(answer);
           }
@@ -511,7 +512,7 @@ const updateEmployeeManager = () => {
           }
         });
 
-        if (validate.isSame(answer.chosenEmployee, answer.newManager)) {
+        if (answer.chosenEmployee === answer.newManager) {
           console.log(chalk.redBright.bold(`+++==============================================================================+++`));
           console.log(chalk.redBright(`Invalid Manager Selection`));
           console.log(chalk.redBright.bold(`+++==============================================================================+++`));

@@ -17,7 +17,7 @@
 #### Run the installation above then execute node server.js
 
 ### Video Walkthrough
-#### https://drive.google.com/file/d/1ZAb6ekbJSEKlbyP_6mlbtFbgC0GbnpDZ/view
+#### https://drive.google.com/file/d/1v-pvE0X6mzj-tulvIZqZ00jxU7f9ecBr/view
 
 ### Github Repository
 #### https://github.com/ArlonTuazon/employeetracker
