@@ -103,7 +103,7 @@ const promptUser = () => {
           }
   
           if (choices === 'Remove Role') {
-              removeRole();
+              deleteRole();
           }
   
           if (choices === 'Add Department') {
@@ -115,7 +115,7 @@ const promptUser = () => {
           }
   
           if (choices === 'Remove Department') {
-              removeDepartment();
+              deleteDepartment();
           }
   
           if (choices === 'Exit') {
@@ -568,6 +568,78 @@ const deleteEmployee = () => {
           console.log(chalk.redBright(`Employee Successfully Removed`));
           console.log(chalk.redBright.bold(`+++==============================================================================+++`));
           viewAllEmployees();
+        });
+      });
+  });
+};
+
+const deleteRole = () => {
+    
+  connection.query(`SELECT role.id, role.title FROM role`, (error, response) => {
+    if (error) throw error;
+    let roleNamesArray = [];
+    response.forEach((role) => {roleNamesArray.push(role.title);});
+
+    inquirer
+      .prompt([
+        {
+          name: 'chosenRole',
+          type: 'list',
+          message: 'Which role would you like to remove?',
+          choices: roleNamesArray
+        }
+      ])
+      .then((answer) => {
+        let roleId;
+
+        response.forEach((role) => {
+          if (answer.chosenRole === role.title) {
+            roleId = role.id;
+          }
+        });
+
+          connection.query(`DELETE FROM role WHERE role.id = ?`, [roleId], (error) => {
+          if (error) throw error;
+          console.log(chalk.redBright.bold(`====================================================================================`));
+          console.log(chalk.greenBright(`Role Successfully Removed`));
+          console.log(chalk.redBright.bold(`====================================================================================`));
+          viewAllRoles();
+        });
+      });
+  });
+};
+// Delete a Department
+const deleteDepartment = () => {
+    
+  connection.query(`SELECT department.id, department.name FROM department`, (error, response) => {
+    if (error) throw error;
+    let departmentNamesArray = [];
+    response.forEach((department) => {departmentNamesArray.push(department.name);});
+
+    inquirer
+      .prompt([
+        {
+          name: 'chosenDept',
+          type: 'list',
+          message: 'Which department would you like to remove?',
+          choices: departmentNamesArray
+        }
+      ])
+      .then((answer) => {
+        let departmentId;
+
+        response.forEach((department) => {
+          if (answer.chosenDept === department.name) {
+            departmentId = department.id;
+          }
+        });
+
+        connection.query(`DELETE FROM department WHERE department.id = ?`, [departmentId], (error) => {
+          if (error) throw error;
+          console.log(chalk.redBright.bold(`====================================================================================`));
+          console.log(chalk.redBright(`Department Successfully Removed`));
+          console.log(chalk.redBright.bold(`====================================================================================`));
+          viewAllDepartments();
         });
       });
   });
